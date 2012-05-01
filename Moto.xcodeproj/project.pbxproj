@@ -1,0 +1,122 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXFileReference section */
+		0EC7CF9610DEC1CE00E241FD /* moto.nxc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c; fileEncoding = 4; name = moto.nxc; path = source/moto.nxc; sourceTree = "<group>"; };
+		3A02EFCE153B6938001B44A0 /* posreg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = posreg.h; path = source/posreg.h; sourceTree = "<group>"; };
+		3A03E595154A8F1A00F25F2D /* settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = settings.h; sourceTree = "<group>"; };
+		3A9AE475153DFE3400702A32 /* logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = logging.h; path = source/logging.h; sourceTree = "<group>"; };
+		5B19633909F4002D0041D50B /* Makefile */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		5BB3CD8309AA56AD00B01DCE = {
+			isa = PBXGroup;
+			children = (
+				5B19633909F4002D0041D50B /* Makefile */,
+				5BFFA2ED09AA5F57008DF6E9 /* build */,
+				5BFFA2EC09AA5F4E008DF6E9 /* source */,
+			);
+			comments = "A sample Xcode project using a Makefile to compile NXC source code.";
+			sourceTree = "<group>";
+		};
+		5BFFA2EC09AA5F4E008DF6E9 /* source */ = {
+			isa = PBXGroup;
+			children = (
+				3A9AE475153DFE3400702A32 /* logging.h */,
+				3A02EFCE153B6938001B44A0 /* posreg.h */,
+				0EC7CF9610DEC1CE00E241FD /* moto.nxc */,
+				3A03E595154A8F1A00F25F2D /* settings.h */,
+			);
+			name = source;
+			sourceTree = "<group>";
+		};
+		5BFFA2ED09AA5F57008DF6E9 /* build */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = build;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		5BFFA23709AA57D9008DF6E9 /* Helloworld */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 5BFFA23809AA5808008DF6E9 /* Build configuration list for PBXLegacyTarget "Helloworld" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = "";
+			dependencies = (
+			);
+			name = Helloworld;
+			passBuildSettingsInEnvironment = 0;
+			productName = Demo;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		5BB3CD8509AA56AD00B01DCE /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 5BB3CD8609AA56AD00B01DCE /* Build configuration list for PBXProject "Moto" */;
+			compatibilityVersion = "Xcode 2.4";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 5BB3CD8309AA56AD00B01DCE;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5BFFA23709AA57D9008DF6E9 /* Helloworld */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		5BB3CD8809AA56AD00B01DCE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		5BFFA23A09AA5808008DF6E9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5BB3CD8609AA56AD00B01DCE /* Build configuration list for PBXProject "Moto" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5BB3CD8809AA56AD00B01DCE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5BFFA23809AA5808008DF6E9 /* Build configuration list for PBXLegacyTarget "Helloworld" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5BFFA23A09AA5808008DF6E9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 5BB3CD8509AA56AD00B01DCE /* Project object */;
+}

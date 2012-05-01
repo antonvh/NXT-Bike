@@ -1,0 +1,162 @@
+// !$*UTF8*$!
+{
+	0EC7CF9610DEC1CE00E241FD /* moto.nxc */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1032, 5408}}";
+			sepNavSelRange = "{1617, 0}";
+			sepNavVisRange = "{1101, 894}";
+			sepNavWindowFrame = "{{38, 85}, {1016, 667}}";
+		};
+	};
+	3A02EF34153B0419001B44A0 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			repositoryNamesForRoots = {
+				"" = "";
+			};
+		};
+	};
+	3A02EF35153B0419001B44A0 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	3A02EFCE153B6938001B44A0 /* posreg.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1032, 1378}}";
+			sepNavSelRange = "{949, 449}";
+			sepNavVisRange = "{274, 1481}";
+			sepNavWindowFrame = "{{246, 35}, {1016, 667}}";
+		};
+	};
+	3A9AE475153DFE3400702A32 /* logging.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {950, 1885}}";
+			sepNavSelRange = "{2310, 0}";
+			sepNavVisRange = "{0, 624}";
+		};
+	};
+	3A9AE49C153E114E00702A32 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 3A9AE49D153E114E00702A32 /* NXTWay.nxc */;
+		name = "NXTWay.nxc: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 1135;
+		vrLoc = 0;
+	};
+	3A9AE49D153E114E00702A32 /* NXTWay.nxc */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = text;
+		name = NXTWay.nxc;
+		path = "/Users/anton/Documents/NXC projects/NXTWay/source/NXTWay.nxc";
+		sourceTree = "<absolute>";
+	};
+	3A9AE49E153E114E00702A32 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 3A9AE475153DFE3400702A32 /* logging.h */;
+		name = "logging.h: 127";
+		rLen = 0;
+		rLoc = 2310;
+		rType = 0;
+		vrLen = 624;
+		vrLoc = 0;
+	};
+	3AE2B6661540BAA5001CECEB /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 3A02EFCE153B6938001B44A0 /* posreg.h */;
+		name = "posreg.h: 31";
+		rLen = 449;
+		rLoc = 949;
+		rType = 0;
+		vrLen = 1481;
+		vrLoc = 274;
+	};
+	3AE2B6671540BAA5001CECEB /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 5B19633909F4002D0041D50B /* Makefile */;
+		name = "Makefile: 10";
+		rLen = 0;
+		rLoc = 156;
+		rType = 0;
+		vrLen = 592;
+		vrLoc = 0;
+	};
+	3AF68ABF154A9B0E005CB797 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 0EC7CF9610DEC1CE00E241FD /* moto.nxc */;
+		name = "moto.nxc: 343";
+		rLen = 0;
+		rLoc = 8417;
+		rType = 0;
+		vrLen = 928;
+		vrLoc = 8176;
+	};
+	3AFDEEB7154FBD7E00EB4714 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 0EC7CF9610DEC1CE00E241FD /* moto.nxc */;
+		name = "moto.nxc: 56";
+		rLen = 0;
+		rLoc = 1617;
+		rType = 0;
+		vrLen = 894;
+		vrLoc = 1101;
+	};
+	5B19633909F4002D0041D50B /* Makefile */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1032, 467}}";
+			sepNavSelRange = "{156, 0}";
+			sepNavVisRange = "{0, 592}";
+			sepNavWindowFrame = "{{15, 106}, {1016, 667}}";
+		};
+	};
+	5BB3CD8509AA56AD00B01DCE /* Project object */ = {
+		activeBuildConfigurationName = Release;
+		activeTarget = 5BFFA23709AA57D9008DF6E9 /* Helloworld */;
+		addToTargets = (
+		);
+		codeSenseManager = 3A02EF35153B0419001B44A0 /* Code sense */;
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					854,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 357474290;
+			PBXWorkspaceStateSaveDate = 357474290;
+		};
+		perUserProjectItems = {
+			3A9AE49C153E114E00702A32 /* PBXTextBookmark */ = 3A9AE49C153E114E00702A32 /* PBXTextBookmark */;
+			3A9AE49E153E114E00702A32 /* PBXTextBookmark */ = 3A9AE49E153E114E00702A32 /* PBXTextBookmark */;
+			3AE2B6661540BAA5001CECEB /* PBXTextBookmark */ = 3AE2B6661540BAA5001CECEB /* PBXTextBookmark */;
+			3AE2B6671540BAA5001CECEB /* PBXTextBookmark */ = 3AE2B6671540BAA5001CECEB /* PBXTextBookmark */;
+			3AF68ABF154A9B0E005CB797 /* PBXTextBookmark */ = 3AF68ABF154A9B0E005CB797 /* PBXTextBookmark */;
+			3AFDEEB7154FBD7E00EB4714 /* PBXTextBookmark */ = 3AFDEEB7154FBD7E00EB4714 /* PBXTextBookmark */;
+		};
+		sourceControlManager = 3A02EF34153B0419001B44A0 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	5BFFA23709AA57D9008DF6E9 /* Helloworld */ = {
+		activeExec = 0;
+	};
+}

@@ -1,0 +1,423 @@
+//=====================================================================
+// Motorbike control. Based on HTWay.
+// A program to let a lego NXT bike stay upright.
+//
+// TODO
+// 
+// 
+// read and save settings using settings.h
+// tweak PID parameters
+//=====================================================================
+
+///////////////////////////////////////////////////////////
+bool LOGGING=true;
+#define LOGFILE "moto.csv"
+#define LOGFILE_SIZE 30000
+#include "logging.h"
+///////////////////////////////////////////////////////////
+
+
+
+// Motor constants
+
+#define GYRO           IN_1
+#define DRIVE_MOTORS   OUT_BC
+#define STEER_MOTOR    OUT_A
+
+#define MAX_STEER_ANGLE	80
+
+// Loop wait time.  WAIT_TIME is the time in ms passed to the
+// Wait command.
+
+#define WAIT_TIME    8 //used to be 8.
+
+
+// Gyro offset control
+// The gyro sensor will drift with time.  This constant is used in a
+// simple long term averaging to adjust for this drift.
+// Every time through the loop, the current gyro sensor value is
+// averaged into the gyro offset weighted according to this constant.
+#define EMAOFFSET 0.0005
+
+// If robot power is saturated (over +/- 100) for over this time limit
+// then robot must have fallen.  In milliseconds.
+#define TIME_FALL_LIMIT     1000
+
+
+//=====================================================================
+// Global variables
+//
+// These variables are used to control the movement of the robot.  
+int direction = 0; //target steering angle
+
+// Time that robot first starts to balance.  Used to calculate tInterval
+long tCalcStart;
+
+// tInterval is the time, in seconds, for each iteration of the
+// balance loop.
+float tInterval;
+
+// Gyro globals
+float gOffset;
+
+float gyroSpeed;
+float gyroAngle = 0;
+float gyroSpeedPrev = 0;
+float gyroAnglePrev = 0;
+float gyroAngleIntegrated = 0;
+float gyroAccl = 0;
+
+//PID Paramaters: gains for feeding back leaning angle to steering.
+float Ppar = 6.0;
+float Ipar = 0.1;
+float Dpar = 0.01;
+float Endgain = 1.0;
+
+#define FWDSPEED 100
+
+
+//=====================================================================
+// set parameters
+//
+// These functions implement a UI so the user can choose the
+// balancing parameters (PID gains).
+
+
+bool YesOrNo(string instruction)
+{
+	bool answer = true;
+		do {
+			
+			ClearScreen();
+			TextOut(6, LCD_LINE2, instruction);
+			TextOut(2, LCD_LINE8, "<   [Select]   >");
+			
+			// Display current selection
+			if (answer) {
+				
+					// Yes
+					TextOut(7, LCD_LINE7, "Yes");
+			} else {
+					// No
+					TextOut(2, LCD_LINE7, "Nope");
+			}
+			
+			
+			// Make sure previous button is released, loop until all released
+			while(ButtonPressed(BTNLEFT, false) ||
+				  ButtonPressed(BTNCENTER, false) ||
+				  ButtonPressed(BTNRIGHT, false));
+			
+			// Get button press
+			while(true) {
+				if (ButtonPressed(BTNLEFT, false)) {
+					answer = !answer;
+					break;
+				}
+				if (ButtonPressed(BTNRIGHT, false)) {
+					answer = !answer;
+					break;
+				}
+				if (ButtonPressed(BTNCENTER, false))
+					break;
+			}
+		} until (ButtonPressed(BTNCENTER, false));
+		return answer;
+		ClearScreen();
+	}
+
+float GetParam(string instruction, string helpText, float DefaultVal)
+{
+	
+	do {
+		// Display base text of user interface on screen
+		ClearScreen();
+		TextOut(6, LCD_LINE2, instruction);
+		TextOut(6, LCD_LINE3, helpText);
+		TextOut(2, LCD_LINE8, "<   [Select]   >");
+		
+		TextOut(7, LCD_LINE7, NumToStr(DefaultVal));
+		
+		
+		// Make sure previous button is released, loop until all released
+		while(ButtonPressed(BTNLEFT, false) ||
+			  ButtonPressed(BTNCENTER, false) ||
+			  ButtonPressed(BTNRIGHT, false));
+		
+		// Get button press
+		while(true) {
+			if (ButtonPressed(BTNLEFT, false)) {
+				DefaultVal--;
+				TextOut(7, LCD_LINE7, NumToStr(DefaultVal));
+				break;
+			}
+			if (ButtonPressed(BTNRIGHT, false)) {
+				DefaultVal++;
+				TextOut(7, LCD_LINE7, NumToStr(DefaultVal));
+				break;
+			}
+			if (ButtonPressed(BTNCENTER, false))
+				break;
+		}
+	} until (ButtonPressed(BTNCENTER, false));
+	ClearScreen();
+}
+
+void SetParameters()
+{
+	if (!YesOrNo("Skip settings?")) {
+	Ppar = GetParam("A. speed gain","Thetadot (P)",Ppar);
+	Dpar = GetParam("A. acc gain","Thetadotdot (D)",Dpar);
+	Ipar = GetParam("Angle gain","Theta (I)",Ipar);
+	Ipar = GetParam("Set end gain:","(divisor)",Endgain);
+	}
+}
+
+
+//=====================================================================
+// GetGyroOffset
+//
+// This function returns a suitable initial gyro offset.  It takes
+// 100 gyro samples over a time of 1/2 second and averages them to
+// get the offset.  It also check the max and min during that time
+// and if the difference is larger than one it rejects the data and
+// gets another set of samples.
+
+#define OFFSET_SAMPLES 100
+
+void GetGyroOffset()
+{
+	float gSum;
+	int  i, gMin, gMax, g;
+	
+	ClearScreen();
+	
+	TextOut(0, LCD_LINE4, "Lay robot down");
+	TextOut(0, LCD_LINE5, "flat to get gyro");
+	TextOut(0, LCD_LINE6, "offset.");
+	
+	// Ensure that the motor controller is active since this affects
+	// the gyro values.
+	Off(OUT_ABC);
+	
+	do {
+		gSum = 0.0;
+		gMin = 1000;
+		gMax = -1000;
+		for (i=0; i<OFFSET_SAMPLES; i++) {
+			g = SensorHTGyro(GYRO);
+			
+			if (g > gMax)
+				gMax = g;
+			if (g < gMin)
+				gMin = g;
+			
+			gSum += g;
+			Wait(WAIT_TIME);
+		}
+	} while ((gMax - gMin) > 1);   // Reject and sample again if range too large
+	
+	//Average the sum of the samples.
+	gOffset = gSum / OFFSET_SAMPLES; //+ 1.0; NXTWay code added 1. Strange.
+	
+}
+
+//=====================================================================
+void StartBeeps()
+{
+	int c;
+	
+	ClearScreen();
+	
+	TextOut(20, LCD_LINE3, "Drive in...");
+	
+	// Play warning beep sequence to indicate balance about to start
+	for (c=5; c>0;c--) {
+		NumOut(47, LCD_LINE4, c);
+		PlayTone(440,100);
+		Wait(1000);
+	}
+	NumOut(47, LCD_LINE4, 0);
+	PlayTone(440,1000);
+	Wait(1000);
+}
+
+//=====================================================================
+// task main - initializes the sensors, Both taskBalance and
+// taskController start when main ends.
+task main()
+{
+	// Initialize the sensors
+	SetSensorHTGyro(GYRO);
+	Wait(50);
+	
+	// Get user input on wheel size
+	SetParameters();
+	
+	//Start logging
+	openLogFile(LOGFILE, LOGFILE_SIZE);
+	
+	// Get the initial gyro offset
+	GetGyroOffset();
+	
+	// Play warning beep sequence before balance starts
+	StartBeeps();
+	
+	// When task main ends, both taskBalance and taskControl will start
+}
+
+//=====================================================================
+// GetGyroData(float &gyroSpeed, float &gyroAngle)
+//
+// Get the data from the gyro.
+// Fills the pass by reference gyroSpeed and gyroAngle based on
+// updated information from the Gyro Sensor
+//
+// Maintains an automatically adjusted gyro offset as well as
+// the integrated gyro angle.
+inline void GetGyroData()
+{
+	float gyroRaw;
+	
+	gyroRaw = SensorHTGyro(GYRO);
+	gOffset = EMAOFFSET * gyroRaw + (1-EMAOFFSET) * gOffset;
+	gyroSpeed = gyroRaw - gOffset;
+	
+	// gyroAngle += (gyroSpeed+gyroSpeedPrev)/2*tInterval; //trapezoid discrete time integration
+	gyroAngle += gyroSpeed*tInterval; //forward euler discrete time integration
+	
+	//gyroAngleIntegrated += gyroAngle*tInterval;
+	
+	gyroAccl = (gyroSpeed - gyroSpeedPrev)/tInterval;
+	gyroSpeedPrev = gyroSpeed;
+}
+
+//--------------------------------------------------------------------
+
+
+
+//---------------------------------------------------------------------
+// void CalcInterval(long cLoop)
+//
+// Calculate the interval time from one iteration of the loop to the next.
+// Note that first time through, cLoop is 0, and has not gone through
+// the body of the loop yet.  Use it to save the start time.
+// After the first iteration, take the average time and convert it to
+// seconds for use as interval time.
+inline void CalcInterval(long cLoop)
+{
+	if (cLoop == 0) {
+		// First time through, set an initial tInterval time and
+		// record start time
+		tInterval = 0.0055;
+		tCalcStart = CurrentTick();
+	} else {
+		// Take average of number of times through the loop and
+		// use for interval time.
+		tInterval = (CurrentTick() - tCalcStart)/(cLoop*1000.0);
+	}
+}
+
+//---------------------------------------------------------------------
+// taskDrive
+// This is the main balance task.
+
+
+task taskBalance()
+{
+	Follows(main);
+	
+	long tStart, motorMove;
+	int steerPwr;
+	
+	ClearScreen();
+	TextOut(0, LCD_LINE4, "Balancing");
+	
+	tInterval = 0.0055;
+	tStart = CurrentTick();
+	tCalcStart = CurrentTick();
+	
+	OnFwd(OUT_BC, FWDSPEED); //full speed ahead!
+	
+	ResetRotationCount(OUT_A);
+	
+	//Motor Regulation using PosReg
+	//SetMotorRegulationTime (10); //Enables us to set a target steering direction each loop
+	//PosRegEnable(OUT_A);
+	
+	//Write log column headers
+	writeLogString("tInterval, GyroSpeed, GyroAngle, Response, MotorPos");
+	
+	while(true) {
+		GetGyroData();
+		
+		//calculate steering target
+		//direction = (Ipar*gyroAngle+Ppar*gyroSpeed+Dpar*gyroAccl)*Endgain;
+		//direction = MotorRotationCount(OUT_A);
+		
+		
+		
+		
+		//if (direction > MAX_STEER_ANGLE) {direction = MAX_STEER_ANGLE;}
+		//if (direction < -MAX_STEER_ANGLE) {direction = -MAX_STEER_ANGLE;}
+		//if (direction > MAX_STEER_ANGLE) {steerPwr = 0;}
+//		if (direction < -MAX_STEER_ANGLE) {steerPwr = 0;}
+		
+		steerPwr = (Ipar*gyroAngle+Ppar*gyroSpeed+Dpar*gyroAccl)*Endgain;
+		if (steerPwr > 0) {OnFwd(OUT_A,steerPwr);}
+	    else {OnRev(OUT_A,-1*steerPwr);}
+
+		
+		
+		//execute steering
+		//using posreg
+		//PosRegSetAngle(OUT_A, direction);
+		
+		
+		//		NumOut(0, LCD_LINE6, gyroAngle);
+		//		NumOut(0, LCD_LINE7, direction);
+		
+		//logging to file
+		writeLogValue5(tInterval, gyroSpeed, gyroAngle, steerPwr, MotorRotationCount(OUT_A)*1.0);
+		
+		if (gyroAngle>45 || gyroAngle < -45) { //we probably have fallen.
+			break;
+		}
+		
+		Wait(WAIT_TIME);
+		
+		
+		//Finally measure and reset our stopwatch
+		tInterval = (CurrentTick() - tStart)/1000; //tInterval is in seconds.
+		tStart = CurrentTick();
+	}
+	Off(OUT_ABC);
+	
+	//closeLogFile();
+	
+	TextOut(0, LCD_LINE4, "Oops... I fell");
+	
+	TextOut(0, LCD_LINE8, "tInt ms:");
+	NumOut(6*8, LCD_LINE8, tInterval*1000);
+}
+
+//task Steer()
+//{
+//	//Follows(main);
+//	int motorPos, motorMove;
+//	//Motor Regulation, manually tracking position
+//	ResetRotationCount(OUT_A);
+//	while(true)
+//	{
+//		//manual mode
+//		motorMove = (direction - motorPos)*3;
+//		if (motorMove > 0) {OnFwdEx(OUT_A,motorMove,0);}
+//		else {OnRevEx(OUT_A,-1*motorMove,0);}
+//		//read motor data
+//		motorPos = MotorRotationCount(OUT_A);
+//		
+//		//output to screen
+//		TextOut(0, LCD_LINE5, NumToStr(motorPos));
+//		Wait(10);
+//	}
+//}

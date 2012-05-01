@@ -1,0 +1,146 @@
+// !$*UTF8*$!
+{
+	0EC7CF8B10DEBF2C00E241FD /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+		};
+	};
+	0EC7CF8C10DEBF2C00E241FD /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	0EC7CF9610DEC1CE00E241FD /* helloworld.nxc */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {791, 437}}";
+			sepNavSelRange = "{208, 0}";
+			sepNavVisRange = "{0, 245}";
+		};
+	};
+	0EC7CF9A10DEC26D00E241FD /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 0EC7CF9610DEC1CE00E241FD /* helloworld.nxc */;
+		name = "helloworld.nxc: 13";
+		rLen = 0;
+		rLoc = 208;
+		rType = 0;
+		vrLen = 245;
+		vrLoc = 0;
+	};
+	0EC7CF9B10DEC26D00E241FD /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 5B19633909F4002D0041D50B /* Makefile */;
+		name = "Makefile: 16";
+		rLen = 0;
+		rLoc = 338;
+		rType = 0;
+		vrLen = 484;
+		vrLoc = 0;
+	};
+	0EC7CF9C10DEC26D00E241FD /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 5B19633909F4002D0041D50B /* Makefile */;
+		name = "Makefile: 16";
+		rLen = 0;
+		rLoc = 338;
+		rType = 0;
+		vrLen = 484;
+		vrLoc = 0;
+	};
+	0EC7CF9D10DEC26D00E241FD /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 0EC7CF9610DEC1CE00E241FD /* helloworld.nxc */;
+		name = "helloworld.nxc: 13";
+		rLen = 0;
+		rLoc = 208;
+		rType = 0;
+		vrLen = 245;
+		vrLoc = 0;
+	};
+	0EC7CF9E10DEC26D00E241FD /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 5B19633909F4002D0041D50B /* Makefile */;
+		name = "Makefile: 18";
+		rLen = 0;
+		rLoc = 395;
+		rType = 0;
+		vrLen = 485;
+		vrLoc = 0;
+	};
+	5B19633909F4002D0041D50B /* Makefile */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {791, 521}}";
+			sepNavSelRange = "{367, 0}";
+			sepNavVisRange = "{0, 485}";
+		};
+	};
+	5BB3CD8509AA56AD00B01DCE /* Project object */ = {
+		activeBuildConfigurationName = Release;
+		activeTarget = 5BFFA23709AA57D9008DF6E9 /* Helloworld */;
+		addToTargets = (
+		);
+		codeSenseManager = 0EC7CF8C10DEBF2C00E241FD /* Code sense */;
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					613,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					573,
+					60,
+					20,
+					48,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 283034237;
+			PBXWorkspaceStateSaveDate = 283034237;
+		};
+		perUserProjectItems = {
+			0EC7CF9A10DEC26D00E241FD = 0EC7CF9A10DEC26D00E241FD /* PBXTextBookmark */;
+			0EC7CF9B10DEC26D00E241FD = 0EC7CF9B10DEC26D00E241FD /* PBXTextBookmark */;
+			0EC7CF9C10DEC26D00E241FD = 0EC7CF9C10DEC26D00E241FD /* PBXTextBookmark */;
+			0EC7CF9D10DEC26D00E241FD = 0EC7CF9D10DEC26D00E241FD /* PBXTextBookmark */;
+			0EC7CF9E10DEC26D00E241FD = 0EC7CF9E10DEC26D00E241FD /* PBXTextBookmark */;
+		};
+		sourceControlManager = 0EC7CF8B10DEBF2C00E241FD /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	5BFFA23709AA57D9008DF6E9 /* Helloworld */ = {
+		activeExec = 0;
+	};
+}
