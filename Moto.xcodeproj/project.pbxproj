@@ -10,6 +10,7 @@
 		0EC7CF9610DEC1CE00E241FD /* moto.nxc */ = {isa = PBXFileReference; explicitFileType = sourcecode.c; fileEncoding = 4; name = moto.nxc; path = source/moto.nxc; sourceTree = "<group>"; };
 		3A02EFCE153B6938001B44A0 /* posreg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = posreg.h; path = source/posreg.h; sourceTree = "<group>"; };
 		3A03E595154A8F1A00F25F2D /* settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = settings.h; sourceTree = "<group>"; };
+		3A820C1715504C4600705213 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		3A9AE475153DFE3400702A32 /* logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = logging.h; path = source/logging.h; sourceTree = "<group>"; };
 		5B19633909F4002D0041D50B /* Makefile */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -21,6 +22,7 @@
 				5B19633909F4002D0041D50B /* Makefile */,
 				5BFFA2ED09AA5F57008DF6E9 /* build */,
 				5BFFA2EC09AA5F4E008DF6E9 /* source */,
+				3A820C1715504C4600705213 /* README.md */,
 			);
 			comments = "A sample Xcode project using a Makefile to compile NXC source code.";
 			sourceTree = "<group>";

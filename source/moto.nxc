@@ -1,35 +1,38 @@
 //=====================================================================
-// Motorbike control. Based on HTWay.
+// Motorbike control.
 // A program to let a lego NXT bike stay upright.
 //
+// INSPIRATION
+// http://bicycle.tudelft.nl/schwab/Bicycle/index.htm#May_2010
+// http://www.hitechnic.com/blog/gyro-sensor/htway/
+//
 // TODO
-// 
-// 
 // read and save settings using settings.h
 // tweak PID parameters
 //=====================================================================
 
-///////////////////////////////////////////////////////////
+//=====================================================================
+//Logging settings and init
 bool LOGGING=true;
 #define LOGFILE "moto.csv"
 #define LOGFILE_SIZE 30000
 #include "logging.h"
-///////////////////////////////////////////////////////////
+//=====================================================================
 
 
+//=====================================================================
+// Constants
 
-// Motor constants
 
 #define GYRO           IN_1
 #define DRIVE_MOTORS   OUT_BC
 #define STEER_MOTOR    OUT_A
-
-#define MAX_STEER_ANGLE	80
+#define MAX_STEER_ANGLE	60		//Physical limit of the lego model
+#define FWDSPEED 100			//Constant forward speed. For Now.
 
 // Loop wait time.  WAIT_TIME is the time in ms passed to the
-// Wait command.
-
-#define WAIT_TIME    8 //used to be 8.
+// Wait command. Too low will give spook sensor readings.
+#define WAIT_TIME    8 
 
 
 // Gyro offset control
@@ -48,17 +51,20 @@ bool LOGGING=true;
 // Global variables
 //
 // These variables are used to control the movement of the robot.  
-int direction = 0; //target steering angle
 
-// Time that robot first starts to balance.  Used to calculate tInterval
-long tCalcStart;
+//target steering angle. Used as target in Position Regulation Mode
+// see http://nxt-firmware.ni.fr.eu.org/changes/absolute_position_regulation/
+int direction = 0; 
 
 // tInterval is the time, in seconds, for each iteration of the
 // balance loop.
 float tInterval;
 
 // Gyro globals
+// Offset is for counteracting drift: when laying perfectly still the gyro
+// wil still give readings. gOffset makes sure they average to zero.
 float gOffset;
+#define OFFSET_SAMPLES 100
 
 float gyroSpeed;
 float gyroAngle = 0;
@@ -69,15 +75,15 @@ float gyroAccl = 0;
 
 //PID Paramaters: gains for feeding back leaning angle to steering.
 float Ppar = 6.0;
-float Ipar = 0.1;
+float Ipar = 0.01;
 float Dpar = 0.01;
 float Endgain = 1.0;
 
-#define FWDSPEED 100
+
 
 
 //=====================================================================
-// set parameters
+// Setup routines
 //
 // These functions implement a UI so the user can choose the
 // balancing parameters (PID gains).
@@ -183,7 +189,6 @@ void SetParameters()
 // and if the difference is larger than one it rejects the data and
 // gets another set of samples.
 
-#define OFFSET_SAMPLES 100
 
 void GetGyroOffset()
 {
@@ -218,11 +223,14 @@ void GetGyroOffset()
 	} while ((gMax - gMin) > 1);   // Reject and sample again if range too large
 	
 	//Average the sum of the samples.
-	gOffset = gSum / OFFSET_SAMPLES; //+ 1.0; NXTWay code added 1. Strange.
+	gOffset = gSum / OFFSET_SAMPLES; //+ 1.0; NXTWay code added 1 here. Strange.
 	
 }
 
+
 //=====================================================================
+// Play warning beep sequence to indicate balance about to start
+
 void StartBeeps()
 {
 	int c;
@@ -231,7 +239,6 @@ void StartBeeps()
 	
 	TextOut(20, LCD_LINE3, "Drive in...");
 	
-	// Play warning beep sequence to indicate balance about to start
 	for (c=5; c>0;c--) {
 		NumOut(47, LCD_LINE4, c);
 		PlayTone(440,100);
@@ -242,9 +249,12 @@ void StartBeeps()
 	Wait(1000);
 }
 
+
 //=====================================================================
-// task main - initializes the sensors, Both taskBalance and
+// task main - initializes the sensors. 
+// Both taskBalance and
 // taskController start when main ends.
+
 task main()
 {
 	// Initialize the sensors
@@ -270,11 +280,11 @@ task main()
 // GetGyroData(float &gyroSpeed, float &gyroAngle)
 //
 // Get the data from the gyro.
-// Fills the pass by reference gyroSpeed and gyroAngle based on
-// updated information from the Gyro Sensor
+// 
 //
 // Maintains an automatically adjusted gyro offset as well as
 // the integrated gyro angle.
+
 inline void GetGyroData()
 {
 	float gyroRaw;
@@ -283,8 +293,11 @@ inline void GetGyroData()
 	gOffset = EMAOFFSET * gyroRaw + (1-EMAOFFSET) * gOffset;
 	gyroSpeed = gyroRaw - gOffset;
 	
-	// gyroAngle += (gyroSpeed+gyroSpeedPrev)/2*tInterval; //trapezoid discrete time integration
-	gyroAngle += gyroSpeed*tInterval; //forward euler discrete time integration
+	//trapezoid discrete time integration:
+	// gyroAngle += (gyroSpeed+gyroSpeedPrev)/2*tInterval; 
+	
+	//forward euler discrete time integration:
+	gyroAngle += gyroSpeed*tInterval; 
 	
 	//gyroAngleIntegrated += gyroAngle*tInterval;
 	
@@ -296,104 +309,62 @@ inline void GetGyroData()
 
 
 
-//---------------------------------------------------------------------
-// void CalcInterval(long cLoop)
-//
-// Calculate the interval time from one iteration of the loop to the next.
-// Note that first time through, cLoop is 0, and has not gone through
-// the body of the loop yet.  Use it to save the start time.
-// After the first iteration, take the average time and convert it to
-// seconds for use as interval time.
-inline void CalcInterval(long cLoop)
-{
-	if (cLoop == 0) {
-		// First time through, set an initial tInterval time and
-		// record start time
-		tInterval = 0.0055;
-		tCalcStart = CurrentTick();
-	} else {
-		// Take average of number of times through the loop and
-		// use for interval time.
-		tInterval = (CurrentTick() - tCalcStart)/(cLoop*1000.0);
-	}
-}
 
 //---------------------------------------------------------------------
 // taskDrive
 // This is the main balance task.
 
 
-task taskBalance()
+task taskDrive()
 {
+	//Start after main task. Commenting this line wil result in not executing this task.
 	Follows(main);
 	
-	long tStart, motorMove;
+	long tStart,tStop,tCalcStart; //loop start &stop time
 	int steerPwr;
 	
 	ClearScreen();
 	TextOut(0, LCD_LINE4, "Balancing");
 	
-	tInterval = 0.0055;
-	tStart = CurrentTick();
-	tCalcStart = CurrentTick();
+	tCalcStart = CurrentTick(); //program start time. For high scores. The longer we balance, the better!
 	
-	OnFwd(OUT_BC, FWDSPEED); //full speed ahead!
+	OnFwd(DRIVE_MOTORS, FWDSPEED); //full speed ahead!
 	
+	//Set up logging
 	ResetRotationCount(OUT_A);
-	
-	//Motor Regulation using PosReg
-	//SetMotorRegulationTime (10); //Enables us to set a target steering direction each loop
-	//PosRegEnable(OUT_A);
-	
 	//Write log column headers
 	writeLogString("tInterval, GyroSpeed, GyroAngle, Response, MotorPos");
 	
+	
+	tStart = CurrentTick();
 	while(true) {
 		GetGyroData();
 		
-		//calculate steering target
-		//direction = (Ipar*gyroAngle+Ppar*gyroSpeed+Dpar*gyroAccl)*Endgain;
-		//direction = MotorRotationCount(OUT_A);
-		
-		
-		
-		
-		//if (direction > MAX_STEER_ANGLE) {direction = MAX_STEER_ANGLE;}
-		//if (direction < -MAX_STEER_ANGLE) {direction = -MAX_STEER_ANGLE;}
-		//if (direction > MAX_STEER_ANGLE) {steerPwr = 0;}
-//		if (direction < -MAX_STEER_ANGLE) {steerPwr = 0;}
-		
+		//Direct PID control to steering angle to minimize angular speed.
 		steerPwr = (Ipar*gyroAngle+Ppar*gyroSpeed+Dpar*gyroAccl)*Endgain;
-		if (steerPwr > 0) {OnFwd(OUT_A,steerPwr);}
-	    else {OnRev(OUT_A,-1*steerPwr);}
+		if (steerPwr > 0) {OnFwd(STEER_MOTOR,steerPwr);}
+	    else {OnRev(STEER_MOTOR,-1*steerPwr);}
 
-		
-		
-		//execute steering
-		//using posreg
-		//PosRegSetAngle(OUT_A, direction);
-		
-		
-		//		NumOut(0, LCD_LINE6, gyroAngle);
-		//		NumOut(0, LCD_LINE7, direction);
-		
 		//logging to file
 		writeLogValue5(tInterval, gyroSpeed, gyroAngle, steerPwr, MotorRotationCount(OUT_A)*1.0);
 		
-		if (gyroAngle>45 || gyroAngle < -45) { //we probably have fallen.
+		//Check wether the bike fell
+		if (gyroAngle>45 || gyroAngle < -45) { 
 			break;
 		}
 		
 		Wait(WAIT_TIME);
 		
-		
-		//Finally measure and reset our stopwatch
-		tInterval = (CurrentTick() - tStart)/1000; //tInterval is in seconds.
-		tStart = CurrentTick();
+		//Finally measure loop time
+		tStop = CurrentTick();
+		tInterval = (tStop - tStart)/1000; //tInterval is in seconds.
+		tStart = tStop;
 	}
+	
+	//We've fallen. Shut down!
 	Off(OUT_ABC);
 	
-	//closeLogFile();
+	closeLogFile();
 	
 	TextOut(0, LCD_LINE4, "Oops... I fell");
 	
@@ -401,6 +372,89 @@ task taskBalance()
 	NumOut(6*8, LCD_LINE8, tInterval*1000);
 }
 
+
+
+//---------------------------------------------------------------------
+// taskDrivePosReg
+// Alternative to the drive task using position regulation.
+// I found this to be slower and I'm afraid it won't work.
+
+
+//task taskDrivePosReg()
+//{
+//	//Start after main task. Commenting this line wil result in not executing this task.
+//	//Follows(main);
+//	
+//	long tStart,tStop,tCalcStart; //loop start time
+//	int steerPwr;
+//	
+//	ClearScreen();
+//	TextOut(0, LCD_LINE4, "Balancing");
+//	
+//	tStart = CurrentTick();
+//	tCalcStart = CurrentTick(); //program start time. For high scores. The longer we balance, the better!
+//	
+//	OnFwd(DRIVE_MOTORS, FWDSPEED); //full speed ahead!
+//	
+//	ResetRotationCount(OUT_A);
+//	
+//	//Motor Regulation using PosReg
+//	//SetMotorRegulationTime (10); //Enables us to set a target steering direction each loop
+//	//PosRegEnable(OUT_A);
+//	
+//	//Write log column headers
+//	writeLogString("tInterval, GyroSpeed, GyroAngle, Response, MotorPos");
+//	
+//	while(true) {
+//		GetGyroData();
+//		
+//		//calculate steering target
+//		//direction = (Ipar*gyroAngle+Ppar*gyroSpeed+Dpar*gyroAccl)*Endgain;
+//		//direction = MotorRotationCount(OUT_A);
+//		
+//		
+//		
+//		
+//		//if (direction > MAX_STEER_ANGLE) {direction = MAX_STEER_ANGLE;}
+//		//if (direction < -MAX_STEER_ANGLE) {direction = -MAX_STEER_ANGLE;}
+//		//if (direction > MAX_STEER_ANGLE) {steerPwr = 0;}
+//		//		if (direction < -MAX_STEER_ANGLE) {steerPwr = 0;}
+//		
+//			
+//		//execute steering
+//		//using posreg
+//		//PosRegSetAngle(OUT_A, direction);
+//		
+//		
+//		//		NumOut(0, LCD_LINE6, gyroAngle);
+//		//		NumOut(0, LCD_LINE7, direction);
+//		
+//		//logging to file
+//		writeLogValue5(tInterval, gyroSpeed, gyroAngle, steerPwr, MotorRotationCount(OUT_A)*1.0);
+//		
+//		if (gyroAngle>45 || gyroAngle < -45) { //we probably have fallen.
+//			break;
+//		}
+//		
+//		Wait(WAIT_TIME);
+//		
+//		
+//		//Finally measure loop time
+//		tStop = CurrentTick();
+//		tInterval = (tStop - tStart)/1000; //tInterval is in seconds.
+//		tStart = tStop;
+//	}
+//	Off(OUT_ABC);
+//	
+//	//closeLogFile();
+//	
+//	TextOut(0, LCD_LINE4, "Oops... I fell");
+//	
+//	TextOut(0, LCD_LINE8, "tInt ms:");
+//	NumOut(6*8, LCD_LINE8, tInterval*1000);
+//	
+//}
+//
 //task Steer()
 //{
 //	//Follows(main);
@@ -421,3 +475,4 @@ task taskBalance()
 //		Wait(10);
 //	}
 //}
+//
